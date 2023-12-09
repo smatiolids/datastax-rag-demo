@@ -1,16 +1,14 @@
-## Your personal effectivity booster
-Generative AI is considered to bring the next Industrial Revolution.
+## Seu acelerador de eficiência pessoal
+Considera-se que a IA generativa trará a próxima Revolução Industrial.
 
-Why? Studies show a **37% efficiency boost** in day to day work activities!
+Por que? Estudos mostram um **aumento de eficiência de 37%** nas atividades de trabalho diárias!
 
-#### What is this app?
-This app is a Chat Agent which takes into account Enterprise Context to provide meaningfull and contextual responses.
-Why is this a big thing? It is because the underlying Foundational Large Language Models are not trained on Enterprise Data. They have no way of knowing anything about your organization.
-Also they are trained upon a moment in time, so typically miss out on relevant and recent information.
+#### O que é esse aplicativo?
+Este aplicativo é um agente de bate-papo que leva em consideração o contexto empresarial para fornecer respostas significativas e contextuais.
+Por que isso é algo importante? Isso ocorre porque os grandes modelos de linguagem fundacionais não são treinados em dados corporativos. Eles não têm como saber nada sobre sua organização.
+Além disso, eles são treinados em um determinado momento, portanto, normalmente perdem informações relevantes e recentes.
 
-#### What does it know?
-Just drop a PDF or Text file into the upload box in the sidebar and hit `Save`.
+#### O que ele sabe?
+Basta subir um arquivo PDF ou texto na caixa de upload na barra lateral e clicar em `Gravar`.
 
-By the way... Be careful with the `Delete context` button. As this will do exactly that. It deletes the preloaded content mentioned above rendering the personal assistant non-contextual 😉
-
----
+A propósito... Tenha cuidado com o botão `Excluir contexto`. Como isso fará exatamente isso. Ele exclui o conteúdo pré-carregado mencionado acima, tornando o assistente pessoal não contextual 😉

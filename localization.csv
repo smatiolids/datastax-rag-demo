@@ -47,3 +47,27 @@ nl_NL,rails_2,(kopieer en plak in de chat)
 nl_NL,logout_caption,Welkom! Ingelogd als
 nl_NL,logout_button,Uitloggen
 nl_NL,sources_used,De volgende context is gebruikt voor dit antwoord:
+pt_BR,connect_astra,Conectando com o Astra DB...
+pt_BR,load_embedding,Buscando embeddings na OpenAI...
+pt_BR,load_vectorstore,Conectando com o Astra DB Vector Store...
+pt_BR,load_retriever,Conectando o retriever...
+pt_BR,load_message_history,Obtendo o histórico de mensagens do Astra DB...
+pt_BR,load_model,Obtendo o modelo de bate-papo OpenAI...
+pt_BR,load_context,Carregue um documento para contexto adicional
+pt_BR,load_context_button,Gravar
+pt_BR,delete_context,"Exclua o contexto, o histórico e recomece. Isso exclui embeddings de vetores para TODOS os usuários!"
+pt_BR,delete_context_button,Remover contexto context
+pt_BR,deleting_context,Removendo contexto e inicializando...
+pt_BR,delete_memory,"Exclua o histórico da memória conversacional."
+pt_BR,deleting_memory,Apagando memória...
+pt_BR,delete_memory_button,Excluir histórico de bate-papo
+pt_BR,assistant_welcome,"Olá, sou seu assistente pessoal e estou pronto para ajudar!"
+pt_BR,assistant_question,E aí?
+pt_BR,load_text,chuncks carregados no Astra DB
+pt_BR,load_pdf,páginas carregadas no Astra DB
+pt_BR,assistant_leadin,Digite por exemplo:
+pt_BR,rails_1,🤩 Tente os seguintes prompts ⬇️
+pt_BR,rails_2,(copie e cole na caixa de chat)
+pt_BR,logout_caption,Bem vindo! Accessando como
+pt_BR,logout_button,Sair
+pt_BR,sources_used,O seguinte contexto foi usado para esta resposta:
