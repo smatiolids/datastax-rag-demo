@@ -1,44 +1,46 @@
-# Configurable Enterprise Chat Agent
-This Chat Agent is build specifically as a reusable and configurable sample app to share with enterprises or prospects. 
+# Agente de bate-papo empresarial configurável
+Este Chat Agent foi desenvolvido especificamente como um aplicativo de exemplo reutilizável e configurável para compartilhar com empresas ou clientes potenciais.
 
-1. It uses [LangChain](https://www.langchain.com/) as the framework to easily set up LLM Q&A chains
-2. It uses [Streamlit](https://streamlit.io/) as the framework to easily create Web Applications
-3. It uses [Astra DB](https://astra.datastax.com/) as the Vector Store to enable Rerieval Augmented Generation in order to provide meaningfull contextual interactions
-4. It uses [Astra DB](https://astra.datastax.com/) as Short Term Memory to keep track of what was said and generated
-5. It uses a StreamingCallbackHandler to stream output to the screen which prevents having to wait for the final answer
-6. It allows for new Content to be uploaded, Vectorized and Stored into the Astra DB Vector Database so it can be used as Context
-7. It offers a configurable localization through `localization.csv`
-8. It offers a guided experience on-rails through `rails.csv`
+1. Ele usa [LangChain](https://www.langchain.com/) como estrutura para configurar facilmente cadeias de perguntas e respostas do LLM
+2. Ele usa [Streamlit](https://streamlit.io/) como estrutura para criar facilmente aplicativos da Web
+3. Ele usa [Astra DB](https://astra.datastax.com/) como armazenamento de vetores para permitir o Retrieval Augmented Generation, a fim de fornecer interações contextuais significativas
+4. Ele usa [Astra DB](https://astra.datastax.com/) como memória de curto prazo para acompanhar o que foi dito e gerado
+5. Ele usa um StreamingCallbackHandler para transmitir a saída para a tela, o que evita ter que esperar pela resposta final
+6. Ele permite que novo conteúdo seja carregado, vetorizado e armazenado no banco de dados vetorial Astra DB para que possa ser usado como contexto
+7. Oferece uma localização configurável através de `localization.csv`
+8. Oferece uma experiência guiada sobre trilhos através de `rails.csv`
 
-## Preparation
-1. First install the Python dependencies using:
+## Preparação
+1. Primeiro instale as dependências do Python usando:
 ```
 pip3 install -r requirements.txt
 ```
-2. Then update the `OpenAI`, `AstraDB` and optionally `LangSmith` secrets in `streamlit-langchain/.streamlit/secrets.toml`. There is an example provided at `secrets.toml.example`.
+2. Em seguida, atualize os segredos `OpenAI`, `AstraDB` e opcionalmente `LangSmith` em `streamlit-langchain/.streamlit/secrets.toml`. Há um exemplo fornecido em `secrets.toml.example`.
 
-## Customization
-Now it's time to customize the app for your specific situation or customers.
-### Step 1
-Define credentials by adding a new username and password in the `[passwords]` section in `streamlit-langchain/.streamlit/secrets.toml`.
-### Step 2
-Define the UI language of the app by adding a localization code in the `[languages]` section in `streamlit-langchain/.streamlit/secrets.toml`. Currently `en_US` and `nl_NL` are supported. However it is easy to add additional languages in `localization.csv`.
-### Step 3
-Create a guided experience by providing sample prompts in `rails.csv`. The convention here is that `<username>` from Step 1 is used to define the experience.
-### Step 4
-Start up the app and pre-load relevant PDF and Text files so that the app has content that can be used as context for the questions/prompts in the next step. All this data will be loaded into a user specific table defined by `<username>`.
-### Step 5
-Create a customized welcome page in the root folder. The convention here is to create a markdown file called `<username>.md`. Ideally, list which files have been pre-loaded.
+## Personalização
 
-## Getting started
-You're ready to run the app as follows:
+Agora é hora de personalizar o aplicativo para seu caso específico.
+
+### Passo 1
+Defina as credenciais adicionando um novo nome de usuário e senha na seção `[passwords]` em `streamlit-langchain/.streamlit/secrets.toml`.
+### Passo 2
+Defina o idioma da UI do aplicativo adicionando um código de localização na seção `[languages]` em `streamlit-langchain/.streamlit/secrets.toml`. Atualmente `en_US`, `nl_NL` e `pt_BR` são suportados. No entanto, é fácil adicionar idiomas adicionais em `localization.csv`.
+### Etapa 3
+Crie uma experiência guiada fornecendo exemplos de prompts em `rails.csv`. A convenção aqui é que `<username>` da Etapa 1 seja usado para definir a experiência.
+### Passo 4
+Inicie o aplicativo e carregue previamente os arquivos PDF e de texto relevantes para que o aplicativo tenha conteúdo que possa ser usado como contexto para as perguntas/solicitações na próxima etapa. Todos esses dados serão carregados em uma tabela específica do usuário definida por `<username>`.
+### Etapa 5
+Crie uma página de boas-vindas personalizada na pasta raiz. A convenção aqui é criar um arquivo markdown chamado `<username>.md`. O ideal é listar quais arquivos foram pré-carregados.
+
+## Começando
+Você está pronto para executar o aplicativo da seguinte maneira:
 ```
-streamlit run app.py
+streamlit execute app.py
 ```
-In addition to the pre-loaded content, a user can add additional content that will be used as context for prompts.
+Além do conteúdo pré-carregado, um usuário pode adicionar conteúdo adicional que será usado como contexto para prompts.
 
-## Deploy to the internet
-It's easy to upload this app to the community edition of Streamlit. As the app uses a login page it is safe to have it publicly available.
+## Implante na Internet
+É fácil enviar este aplicativo para a edição comunitária do Streamlit. Como o aplicativo usa uma página de login, é seguro disponibilizá-la publicamente.
 
-## Warning
-The goal of this app is to be easily shared within enterprises. Just be aware that YOUR OPENAI subscription is being used for creating embeddings and LLM calls. This WILL incur cost.
+## Aviso
+O objetivo deste aplicativo é ser facilmente compartilhado dentro das empresas. Esteja ciente de que SUA assinatura OPENAI está sendo usada para criar embeddings e chamadas LLM. Isso IRÁ incorrer em custos.
