@@ -387,7 +387,7 @@ if question := st.chat_input(lang_dict['assistant_question']):
             source = doc.metadata['source']
             page_content = doc.page_content
             if source not in sources:
-                content += f"""📙 :orange[{os.path.basename(os.path.normpath(source))}]  
+                content += f"""📙 :orange[{source}]  
 """
                 sources.append(source)
         print(f"Used sources: {sources}")
