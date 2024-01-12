@@ -71,3 +71,27 @@ pt_BR,rails_2,(copie e cole na caixa de chat)
 pt_BR,logout_caption,Bem vindo! Accessando como
 pt_BR,logout_button,Sair
 pt_BR,sources_used,O seguinte contexto foi usado para esta resposta:
+es_ES,connect_astra,Configurando la conexión Astra DB...
+es_ES,load_embedding,Obteniendo los embeddings de OpenAI...
+es_ES,load_vectorstore,Obteniendo Vector Store de Astra DB...
+es_ES,load_retriever,Obteniendo el retriever...
+es_ES,load_message_history,Obteniendo el historial de mensajes de Astra DB...
+es_ES,load_model,Obteniendo el modelo de chat OpenAI...
+es_ES,load_context,Subir un documento para contexto adicional
+es_ES,load_context_button,Guardar
+es_ES,delete_context,"Elimine el contexto, el historial y comience de nuevo. ¡Esto elimina las incrustaciones de vectores para TODOS los usuarios!"
+es_ES,delete_context_button,Eliminar contexto
+es_ES,deleting_context,Eliminando contexto e inicializando...
+es_ES,delete_memory,Eliminar el historial en la memoria conversacional.
+es_ES,deleting_memory,Eliminando memoria...
+es_ES,delete_memory_button,Eliminar historial de chat
+es_ES,assistant_welcome,"Hola, ¡soy tu asistente personal y estoy listo para ayudarte!"
+es_ES,assistant_question,¿Qué pasa?
+es_ES,load_text,fragmentos cargados en Astra DB
+es_ES,load_pdf,páginas cargadas en Astra DB
+es_ES,assistant_leadin,Escriba por ejemplo:
+es_ES,rails_1,🤩 Pruebe las siguientes indicaciones ⬇️
+es_ES,rails_2,(copiar y pegar en el cuadro de chat)
+es_ES,logout_caption,¡Bienvenido! Conectado como
+es_ES,logout_button,Cerrar sesión
+es_ES,sources_used,Se utilizó el siguiente contexto para esta respuesta:

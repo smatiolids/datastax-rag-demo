@@ -279,7 +279,7 @@ except:
 
 # DataStax logo
 with st.sidebar:
-    st.image('./assets/datastax-logo.svg')
+    st.image('./assets/datastax-logo-reverse_transparent-background.png')
     st.text('')
 
 # Logout button
