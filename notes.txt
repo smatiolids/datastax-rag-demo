@@ -1,0 +1,1 @@
+https://astra-glue.s3.amazonaws.com/astra-jdbc-connector-5.0-jdk8.jar

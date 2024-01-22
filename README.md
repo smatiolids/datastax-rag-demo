@@ -35,7 +35,7 @@ Crie uma página de boas-vindas personalizada na pasta raiz. A convenção aqui 
 ## Começando
 Você está pronto para executar o aplicativo da seguinte maneira:
 ```
-streamlit execute app.py
+streamlit run app.py
 ```
 Além do conteúdo pré-carregado, um usuário pode adicionar conteúdo adicional que será usado como contexto para prompts.
 

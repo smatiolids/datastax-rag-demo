@@ -28,6 +28,8 @@ from langchain.schema.runnable import RunnableMap
 
 from langchain.callbacks.base import BaseCallbackHandler
 
+from flightAssistant import TheFlightAssistant
+
 print("Started")
 
 # Streaming call back handler for responses
@@ -210,10 +212,11 @@ def load_model():
     print("load_model")
     # Get the OpenAI Chat Model
     return ChatOpenAI(
-        temperature=0.3,
+        temperature=0,
         model='gpt-4-1106-preview',
         streaming=True,
-        verbose=True
+        verbose=True,
+        stop=["\nObservation"]
     )
 
 # Cache Chat History for future runs
@@ -294,10 +297,11 @@ with st.sidebar:
     embedding = load_embedding()
     vectorstore = load_vectorstore(username)
     retriever = load_retriever()
-    model = load_model()
+    # model = load_model()
     chat_history = load_chat_history(username)
     memory = load_memory()
-    prompt = load_prompt()
+    # prompt = load_prompt()
+    agent = TheFlightAssistant('f08a6894-1863-491d-8116-3945fb915597', retriever=retriever, memory=memory)
 
 # Include the upload form for new data to be Vectorized
 with st.sidebar:
@@ -360,24 +364,24 @@ if question := st.chat_input(lang_dict['assistant_question']):
         history = memory.load_memory_variables({})
         print(f"Using memory: {history}")
 
-        inputs = RunnableMap({
-            'context': lambda x: retriever.get_relevant_documents(x['question']),
-            'chat_history': lambda x: x['chat_history'],
-            'question': lambda x: x['question']
-        })
-        print(f"Using inputs: {inputs}")
+        # inputs = RunnableMap({
+        #     'context': lambda x: retriever.get_relevant_documents(x['question']),
+        #     'chat_history': lambda x: x['chat_history'],
+        #     'question': lambda x: x['question']
+        # })
+        # print(f"Using inputs: {inputs}")
 
-        chain = inputs | prompt | model
-        print(f"Using chain: {chain}")
+        # chain = inputs | prompt | model
+        # print(f"Using chain: {chain}")
 
         # Call the chain and stream the results into the UI
-        response = chain.invoke({'question': question, 'chat_history': history}, config={'callbacks': [StreamHandler(response_placeholder)]})
+        # response = chain.invoke({'question': question, 'chat_history': history}, config={'callbacks': [StreamHandler(response_placeholder)]})
+        response = agent.invoke(question)
         print(f"Response: {response}")
-        print(embedding.embed_query(question))
-        content = response.content
-
+        content = response
         # Write the sources used
-        relevant_documents = retriever.get_relevant_documents(question)
+        relevant_documents = []
+        # relevant_documents = retriever.get_relevant_documents(question)
         content += f"""
         
 *{lang_dict['sources_used']}:*  
