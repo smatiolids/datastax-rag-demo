@@ -90,6 +90,7 @@ class ScheduledFlightsInput(BaseModel):
 def get_scheduled_flights(customer_id: str, conditions: dict) -> [str]:
     """Returns information about scheduled flights considering conditions for arrivalAirport, departureAirport, departureDateTime. Consider Airport codes and Dates in ISO format """
     filter = {"customerId": customer_id, **conditions}
+    print(f"Scheduled flights condition: {conditions}")
     
     flights = airline_tickets_collection.find(filter=filter, projection={
                                               "departureAirport": 1, "arrivalAirport": 1, "departureDateTime": 1})
@@ -105,6 +106,7 @@ class ScheduledFlightDetailInput(BaseModel):
 @tool(args_schema=ScheduledFlightDetailInput)
 def get_flight_detail(ticket_id: str) -> [str]:
     """Returns information about on flight"""
+    print(f"Flight detail: {ticket_id}")
     filter = {"_id": ticket_id}
     flights = airline_tickets_collection.find_one(filter=filter)
     return flights['data']['document']
@@ -145,8 +147,6 @@ class TheFlightAssistant:
         You are talking to {customer_name}.
         Customer ID: {customer_id}
         Answer in {language}.
-
-        {chat_history}
         
         Use the following format:
 
@@ -176,7 +176,7 @@ class TheFlightAssistant:
         llm = ChatOpenAI(temperature=0,
                         model_name='gpt-4-1106-preview',
                         stop=["\nObservation"],
-                        memory=memory,
+                        # memory=memory,
                         callbacks=[AgentCallbackHandler()])
 
     
