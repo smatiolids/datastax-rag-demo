@@ -21,7 +21,7 @@ import re
 load_dotenv()
 
 CUSTOMER_ID = 'f08a6894-1863-491d-8116-3945fb915597'
-
+ASTRA_URL = f'{os.environ.get("ASTRA_API_ENDPOINT")}/api/rest/v2/keyspaces/{os.environ.get("ASTRA_KEYSPACE")}'
 astra_db = AstraDB(
     api_endpoint=os.environ.get("ASTRA_DB_VECTOR_API_ENDPOINT"),
     token=os.environ.get("ASTRA_DB_VECTOR_TOKEN"),
@@ -34,7 +34,7 @@ airline_tickets_collection = AstraDBCollection(
 def astra_rest(table, pk, params={}, filters=[], method='GET', data={}):
     headers = {'Accept': 'application/json',
                'X-Cassandra-Token': f'{os.environ.get("ASTRA_TOKEN")}'}
-    url = f'{os.environ.get("ASTRA_API_ENDPOINT")}/api/rest/v2/keyspaces/{os.environ.get("ASTRA_KEYSPACE")}/{table}/{"/".join(pk)}?{urlencode(params)}'
+    url = f'{ASTRA_URL}/{table}/{"/".join(pk)}?{urlencode(params)}'
 
     res = requests.request(
         method, url=url, headers=headers, data=json.dumps(data))
@@ -51,7 +51,7 @@ def astra_rest(table, pk, params={}, filters=[], method='GET', data={}):
 
 
 # TOOL Definition
-    
+
 class CustomerFeatureInput(BaseModel):
     customer_id: str = Field(
         description="The UUID that represents the customer")
@@ -91,10 +91,11 @@ def get_scheduled_flights(customer_id: str, conditions: dict) -> [str]:
     """Returns information about scheduled flights considering conditions for arrivalAirport, departureAirport, departureDateTime. Consider Airport codes and Dates in ISO format """
     filter = {"customerId": customer_id, **conditions}
     print(f"Scheduled flights condition: {conditions}")
-    
+
     flights = airline_tickets_collection.find(filter=filter, projection={
                                               "departureAirport": 1, "arrivalAirport": 1, "departureDateTime": 1})
     return flights['data']['documents']
+
 
 class ScheduledFlightDetailInput(BaseModel):
     ticket_id: str = Field(
@@ -112,7 +113,6 @@ def get_flight_detail(ticket_id: str) -> [str]:
     return flights['data']['document']
 
 # Auxiliary functions
-
 def find_tool_by_name(tools: List[Tool], tool_name: str) -> Tool:
     for tool in tools:
         if tool.name == tool_name:
@@ -122,21 +122,22 @@ def find_tool_by_name(tools: List[Tool], tool_name: str) -> Tool:
 def remove_json_comments(json_with_comments):
     """Sometimes, the JSON returned by the LLM contains comments, then it is needed to remove it"""
     comment_pattern = r'/\*.*?\*/|//.*?$'
-    json_without_comments = re.sub(comment_pattern, '', json_with_comments, flags=re.MULTILINE)
+    json_without_comments = re.sub(
+        comment_pattern, '', json_with_comments, flags=re.MULTILINE)
     return json_without_comments
-
 
 # The Agent
 class TheFlightAssistant:
     agent = None
     tools = [get_customer_feature, get_scheduled_flights, get_flight_detail]
-    def __init__(self, customer_id, retriever = None, memory = None):
+
+    def __init__(self, customer_id, retriever=None, memory=None):
         retriever_tool = create_retriever_tool(
             retriever,
             "search_qa",
             "Knowledge base for general questions.",
         )
-    
+
         self.tools.append(retriever_tool)
         # https://smith.langchain.com/hub/hwchase17/react
         template = """
@@ -174,12 +175,11 @@ class TheFlightAssistant:
         )
 
         llm = ChatOpenAI(temperature=0,
-                        model_name='gpt-4-1106-preview',
-                        stop=["\nObservation"],
-                        # memory=memory,
-                        callbacks=[AgentCallbackHandler()])
+                         model_name='gpt-4-1106-preview',
+                         stop=["\nObservation"],
+                         # memory=memory,
+                         callbacks=[AgentCallbackHandler()])
 
-    
         self.agent = (
             {
                 "input": lambda x: x["input"],
@@ -198,7 +198,7 @@ class TheFlightAssistant:
         while not isinstance(agent_step, AgentFinish):
             agent_step: [AgentFinish, AgentAction] = self.agent.invoke(
                 {"input": question,
-                "agent_scratchpad": intermediate_steps})
+                 "agent_scratchpad": intermediate_steps})
 
             print(agent_step)
 
@@ -207,7 +207,8 @@ class TheFlightAssistant:
                 tool_to_use = find_tool_by_name(self.tools, tool_name)
                 tool_input = agent_step.tool_input
                 print("Tool input: ", tool_input)
-                observation = tool_to_use.func(**json.loads(remove_json_comments(tool_input)))
+                observation = tool_to_use.func(
+                    **json.loads(remove_json_comments(tool_input)))
                 print(f"{observation=}")
                 intermediate_steps.append((agent_step, str(observation)))
 

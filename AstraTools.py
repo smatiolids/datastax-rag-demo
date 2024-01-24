@@ -1,24 +1,30 @@
-from typing import Optional, Type
 
-from langchain.callbacks.manager import (
-    AsyncCallbackManagerForToolRun,
-    CallbackManagerForToolRun,
-)
-
-
-class AstraRESTTool(BaseTool):
-    name = "custom_search"
-    description = "useful for when you need to answer questions about current events"
-    args_schema: Type[BaseModel] = SearchInput
-
-    def _run(
-        self, query: str, run_manager: Optional[CallbackManagerForToolRun] = None
-    ) -> str:
-        """Use the tool."""
-        return "LangChain"
-
-    async def _arun(
-        self, query: str, run_manager: Optional[AsyncCallbackManagerForToolRun] = None
-    ) -> str:
-        """Use the tool asynchronously."""
-        raise NotImplementedError("custom_search does not support async")
+# Define the Tools and 
+ASTRA_TOOLS = [{
+    "name": "get_customer_feature",
+    "description": "Given a customer_id and a feature, returns and information about the customer",
+    "source": "REST",
+    "table": "airlinecustomerfeaturestore",
+    "params":  {
+        "customer_id": {
+            "type": str,
+            "mandatory": True,
+            "description": "The UUID that represents the customer"},
+        "feature":  {
+            "type": str,
+            "mandatory": True,
+            "description": "The information about the customer: date_of_birth, gender, has_TSA, meal_preference, miles, miles category, nationality"
+        }
+    },
+    "options": {'page-size': 1,
+                'fields': 'feature,value'}
+}, {
+    "name": "get_scheduled_flights",
+    "description": "Returns information about scheduled flights considering conditions for arrivalAirport, departureAirport, departureDateTime. Consider Airport codes and Dates in ISO format",
+    "source": "REST",
+    "table": "airlinecustomerfeaturestore",
+    "params": [{"customer_id": "string", "mandatory": True},
+               {"feature": "string", "mandatory": True}],
+    "options": {'page-size': 1,
+                'fields': 'feature,value'}
+}]
