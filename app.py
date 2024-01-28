@@ -3,10 +3,11 @@ from pathlib import Path
 import hmac
 import streamlit as st
 os.environ["OPENAI_API_KEY"] = st.secrets['OPENAI_API_KEY']
-os.environ["LANGCHAIN_API_KEY"] = st.secrets['LANGCHAIN_API_KEY']
-os.environ["LANGCHAIN_TRACING_V2"] = "true"
-os.environ["LANGCHAIN_ENDPOINT"] = st.secrets['LANGCHAIN_ENDPOINT']
-os.environ["LANGCHAIN_PROJECT"] = st.secrets['LANGCHAIN_PROJECT']
+if ('LANGCHAIN_API_KEY' in st.secrets.keys()):
+    os.environ["LANGCHAIN_API_KEY"] = st.secrets['LANGCHAIN_API_KEY']
+    os.environ["LANGCHAIN_TRACING_V2"] = "true"
+    os.environ["LANGCHAIN_ENDPOINT"] = st.secrets['LANGCHAIN_ENDPOINT']
+    os.environ["LANGCHAIN_PROJECT"] = st.secrets['LANGCHAIN_PROJECT']
 
 import pandas as pd
 
@@ -382,19 +383,20 @@ if question := st.chat_input(lang_dict['assistant_question']):
         # Write the sources used
         relevant_documents = []
         # relevant_documents = retriever.get_relevant_documents(question)
-        content += f"""
-        
+        if len(relevant_documents) > 0:
+            content += f"""
+    
 *{lang_dict['sources_used']}:*  
 """
-        sources = []
-        for doc in relevant_documents:
-            source = doc.metadata['source']
-            page_content = doc.page_content
-            if source not in sources:
-                content += f"""📙 :orange[{os.path.basename(os.path.normpath(source))}]  
-"""
-                sources.append(source)
-        print(f"Used sources: {sources}")
+            sources = []
+            for doc in relevant_documents:
+                source = doc.metadata['source']
+                page_content = doc.page_content
+                if source not in sources:
+                    content += f"""📙 :orange[{os.path.basename(os.path.normpath(source))}]  
+ """
+                    sources.append(source)
+            print(f"Used sources: {sources}")
 
         # Write the final answer without the cursor
         response_placeholder.markdown(content)

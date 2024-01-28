@@ -20,7 +20,7 @@ import re
 
 load_dotenv()
 
-CUSTOMER_ID = 'f08a6894-1863-491d-8116-3945fb915597'
+CUSTOMER_ID = 'f08a6894-1863-491d-8116-3945fb915597' ## Mocked for testing
 ASTRA_URL = f'{os.environ.get("ASTRA_API_ENDPOINT")}/api/rest/v2/keyspaces/{os.environ.get("ASTRA_KEYSPACE")}'
 astra_db = AstraDB(
     api_endpoint=os.environ.get("ASTRA_DB_VECTOR_API_ENDPOINT"),
