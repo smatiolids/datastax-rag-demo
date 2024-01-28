@@ -4,3 +4,4 @@
 /bin
 /etc
 /lib
+.env
