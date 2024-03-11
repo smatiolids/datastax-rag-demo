@@ -1,39 +1,38 @@
+from langchain.callbacks.base import BaseCallbackHandler
+from langchain.schema.runnable import RunnableMap
+from langchain.prompts import ChatPromptTemplate
+from langchain.schema import HumanMessage, AIMessage, Document
+from langchain.document_loaders import PyPDFLoader
+from langchain.text_splitter import RecursiveCharacterTextSplitter
+import tempfile
+from langchain.memory import AstraDBChatMessageHistory
+from langchain.memory import ConversationBufferWindowMemory
+from langchain.embeddings import OpenAIEmbeddings
+from langchain.vectorstores import AstraDB as AstraDBVectorStore
+from langchain_community.chat_models import ChatOpenAI
+# from astrapy.db import AstraDB
+import pandas as pd
 import os
 from pathlib import Path
 import hmac
 import streamlit as st
+
 os.environ["OPENAI_API_KEY"] = st.secrets['OPENAI_API_KEY']
+
 if ('LANGCHAIN_API_KEY' in st.secrets.keys()):
     os.environ["LANGCHAIN_API_KEY"] = st.secrets['LANGCHAIN_API_KEY']
     os.environ["LANGCHAIN_TRACING_V2"] = "true"
     os.environ["LANGCHAIN_ENDPOINT"] = st.secrets['LANGCHAIN_ENDPOINT']
     os.environ["LANGCHAIN_PROJECT"] = st.secrets['LANGCHAIN_PROJECT']
 
-import pandas as pd
-
-from astrapy.db import AstraDB
-
-from langchain.chat_models import ChatOpenAI
-from langchain.vectorstores import AstraDB
-from langchain.embeddings import OpenAIEmbeddings
-from langchain.memory import ConversationBufferWindowMemory
-from langchain.memory import AstraDBChatMessageHistory
-
-import tempfile
-from langchain.text_splitter import RecursiveCharacterTextSplitter
-from langchain.document_loaders import PyPDFLoader
-
-from langchain.schema import HumanMessage, AIMessage, Document
-from langchain.prompts import ChatPromptTemplate
-from langchain.schema.runnable import RunnableMap
-
-from langchain.callbacks.base import BaseCallbackHandler
 
 from flightAssistant import TheFlightAssistant
 
 print("Started")
 
 # Streaming call back handler for responses
+
+
 class StreamHandler(BaseCallbackHandler):
     def __init__(self, container, initial_text=""):
         self.container = container
@@ -46,6 +45,7 @@ class StreamHandler(BaseCallbackHandler):
 #################
 ### Constants ###
 #################
+
 
 # Define the number of docs to retrieve from the vectorstore and memory
 top_k_vectorstore = 4
@@ -69,6 +69,8 @@ global memory
 #################
 
 # Close off the app using a password
+
+
 def check_password():
     """Returns `True` if the user had a correct password."""
 
@@ -98,15 +100,18 @@ def check_password():
         st.error('😕 User not known or password incorrect')
     return False
 
+
 def logout():
     del st.session_state.password_correct
     del st.session_state.user
 
 # Function for Vectorizing uploaded data into Astra DB
+
+
 def vectorize_text(uploaded_files):
     for uploaded_file in uploaded_files:
         if uploaded_file is not None:
-            
+
             # Write to temporary file
             temp_dir = tempfile.TemporaryDirectory()
             file = uploaded_file
@@ -117,13 +122,14 @@ def vectorize_text(uploaded_files):
 
             # Create the text splitter
             text_splitter = RecursiveCharacterTextSplitter(
-                chunk_size = 1500,
-                chunk_overlap  = 100
+                chunk_size=1500,
+                chunk_overlap=100
             )
 
             if uploaded_file.name.endswith('txt'):
                 file = [uploaded_file.read().decode()]
-                texts = text_splitter.create_documents(file, [{'source': uploaded_file.name}])
+                texts = text_splitter.create_documents(
+                    file, [{'source': uploaded_file.name}])
                 vectorstore.add_documents(texts)
                 st.info(f"{len(texts)} {lang_dict['load_text']}")
 
@@ -134,7 +140,7 @@ def vectorize_text(uploaded_files):
                 docs.extend(loader.load())
 
                 pages = text_splitter.split_documents(docs)
-                vectorstore.add_documents(pages)  
+                vectorstore.add_documents(pages)
                 st.info(f"{len(pages)} {lang_dict['load_pdf']}")
 
 ##################
@@ -142,6 +148,8 @@ def vectorize_text(uploaded_files):
 ##################
 
 # Cache localized strings
+
+
 @st.cache_data()
 def load_localization(locale):
     print("load_localization")
@@ -149,10 +157,13 @@ def load_localization(locale):
     df = pd.read_csv("localization.csv")
     df = df.query(f"locale == '{locale}'")
     # Create and return a dictionary of key/values.
-    lang_dict = {df.key.to_list()[i]:df.value.to_list()[i] for i in range(len(df.key.to_list()))}
+    lang_dict = {df.key.to_list()[i]: df.value.to_list()[i]
+                 for i in range(len(df.key.to_list()))}
     return lang_dict
 
 # Cache localized strings
+
+
 @st.cache_data()
 def load_rails(username):
     print("load_rails")
@@ -160,12 +171,14 @@ def load_rails(username):
     df = pd.read_csv("rails.csv")
     df = df.query(f"username == '{username}'")
     # Create and return a dictionary of key/values.
-    rails_dict = {df.key.to_list()[i]:df.value.to_list()[i] for i in range(len(df.key.to_list()))}
+    rails_dict = {df.key.to_list()[i]: df.value.to_list()[i]
+                  for i in range(len(df.key.to_list()))}
     return rails_dict
 
 #############
 ### Login ###
 #############
+
 
 # Check for username/password and set the username accordingly
 if not check_password():
@@ -173,6 +186,9 @@ if not check_password():
 
 username = st.session_state.user
 language = st.secrets.languages[username]
+ASTRA_DB_VECTOR_API_ENDPOINT = st.secrets.astra_db_endpoint[username]
+ASTRA_DB_VECTOR_TOKEN = st.secrets.astra_db_token[username]
+
 lang_dict = load_localization(language)
 
 #######################
@@ -180,6 +196,8 @@ lang_dict = load_localization(language)
 #######################
 
 # Cache OpenAI Embedding for future runs
+
+
 @st.cache_resource(show_spinner=lang_dict['load_embedding'])
 def load_embedding():
     print("load_embedding")
@@ -187,18 +205,22 @@ def load_embedding():
     return OpenAIEmbeddings()
 
 # Cache Vector Store for future runs
+
+
 @st.cache_resource(show_spinner=lang_dict['load_vectorstore'])
 def load_vectorstore(username):
-    print("load_vectorstore")
+    print(f"load_vectorstore: Astra DB ID: {ASTRA_DB_VECTOR_API_ENDPOINT[8:44]}")
     # Get the load_vectorstore store from Astra DB
-    return AstraDB(
+    return AstraDBVectorStore(
         embedding=embedding,
         collection_name=f"vector_context_{username}",
-        token=st.secrets["ASTRA_VECTOR_TOKEN"],
-        api_endpoint=os.environ["ASTRA_VECTOR_ENDPOINT"],
+        token=ASTRA_DB_VECTOR_TOKEN,
+        api_endpoint=ASTRA_DB_VECTOR_API_ENDPOINT
     )
-    
+
 # Cache Retriever for future runs
+
+
 @st.cache_resource(show_spinner=lang_dict['load_retriever'])
 def load_retriever():
     print("load_retriever")
@@ -208,6 +230,8 @@ def load_retriever():
     )
 
 # Cache OpenAI Chat Model for future runs
+
+
 @st.cache_resource(show_spinner=lang_dict['load_model'])
 def load_model():
     print("load_model")
@@ -221,14 +245,19 @@ def load_model():
     )
 
 # Cache Chat History for future runs
+
+
 @st.cache_resource(show_spinner=lang_dict['load_message_history'])
 def load_chat_history(username):
     print("load_chat_history")
     return AstraDBChatMessageHistory(
         session_id=username,
-        api_endpoint=os.environ["ASTRA_VECTOR_ENDPOINT"],
-        token=st.secrets["ASTRA_VECTOR_TOKEN"],
+        token=ASTRA_DB_VECTOR_TOKEN,  # st.secrets["ASTRA_VECTOR_TOKEN"],
+        # os.environ["ASTRA_VECTOR_ENDPOINT"],
+        api_endpoint=ASTRA_DB_VECTOR_API_ENDPOINT
+
     )
+
 
 @st.cache_resource(show_spinner=lang_dict['load_message_history'])
 def load_memory():
@@ -243,6 +272,8 @@ def load_memory():
     )
 
 # Cache prompt
+
+
 @st.cache_data()
 def load_prompt():
     print("load_prompt")
@@ -267,9 +298,11 @@ Answer in the user's language:"""
 ### Session state ###
 #####################
 
+
 # Start with empty messages, stored in session state
 if 'messages' not in st.session_state:
-    st.session_state.messages = [AIMessage(content=lang_dict['assistant_welcome'])]
+    st.session_state.messages = [
+        AIMessage(content=lang_dict['assistant_welcome'])]
 
 ############
 ### Main ###
@@ -298,16 +331,17 @@ with st.sidebar:
     embedding = load_embedding()
     vectorstore = load_vectorstore(username)
     retriever = load_retriever()
-    # model = load_model()
+    model = load_model()
     chat_history = load_chat_history(username)
     memory = load_memory()
-    # prompt = load_prompt()
+    prompt = load_prompt()
     agent = TheFlightAssistant('f08a6894-1863-491d-8116-3945fb915597', retriever=retriever, memory=memory)
 
 # Include the upload form for new data to be Vectorized
 with st.sidebar:
     with st.form('upload'):
-        uploaded_file = st.file_uploader(lang_dict['load_context'], type=['txt', 'pdf'], accept_multiple_files=True)
+        uploaded_file = st.file_uploader(lang_dict['load_context'], type=[
+                                         'txt', 'pdf'], accept_multiple_files=True)
         submitted = st.form_submit_button(lang_dict['load_context_button'])
         if submitted:
             vectorize_text(uploaded_file)
@@ -326,19 +360,21 @@ if (username in st.secrets['delete_option'] and st.secrets.delete_option[usernam
     with st.sidebar:
         with st.form('delete_context'):
             st.caption(lang_dict['delete_context'])
-            submitted = st.form_submit_button(lang_dict['delete_context_button'])
+            submitted = st.form_submit_button(
+                lang_dict['delete_context_button'])
             if submitted:
                 with st.spinner(lang_dict['deleting_context']):
                     vectorstore.clear()
                     memory.clear()
-                    st.session_state.messages = [AIMessage(content=lang_dict['assistant_welcome'])]
+                    st.session_state.messages = [
+                        AIMessage(content=lang_dict['assistant_welcome'])]
 
 # Draw rails
 with st.sidebar:
-        st.subheader(lang_dict['rails_1'])
-        st.caption(lang_dict['rails_2'])
-        for i in rails_dict:
-            st.markdown(f"{i}. {rails_dict[i]}")
+    st.subheader(lang_dict['rails_1'])
+    st.caption(lang_dict['rails_2'])
+    for i in rails_dict:
+        st.markdown(f"{i}. {rails_dict[i]}")
 
 # Draw all messages, both user and agent so far (every time the app reruns)
 for message in st.session_state.messages:
@@ -364,28 +400,49 @@ if question := st.chat_input(lang_dict['assistant_question']):
 
         history = memory.load_memory_variables({})
         print(f"Using memory: {history}")
-
-        # inputs = RunnableMap({
-        #     'context': lambda x: retriever.get_relevant_documents(x['question']),
-        #     'chat_history': lambda x: x['chat_history'],
-        #     'question': lambda x: x['question']
-        # })
-        # print(f"Using inputs: {inputs}")
-
-        # chain = inputs | prompt | model
-        # print(f"Using chain: {chain}")
-
-        # Call the chain and stream the results into the UI
-        # response = chain.invoke({'question': question, 'chat_history': history}, config={'callbacks': [StreamHandler(response_placeholder)]})
-        response = agent.invoke(question)
-        print(f"Response: {response}")
-        content = response
-        # Write the sources used
         relevant_documents = []
-        # relevant_documents = retriever.get_relevant_documents(question)
-        if len(relevant_documents) > 0:
-            content += f"""
-    
+        content = ''
+
+        mode = 'agent'
+        if mode == 'agent':
+            response = agent.invoke(question)
+            print(f"Response: {response}")
+            content = response["content"]
+            print(response["content"])
+            relevant_tools = response["steps"]
+
+            if len(relevant_tools) > 0:
+                content += f"""
+
+*{lang_dict['tools_used']}:*  
+"""
+                sources = []
+                for step in relevant_tools:
+                    tool = step[0]
+                    content += f""" :orange[{tool.tool}]  
+"""
+ 
+        else:
+            inputs = RunnableMap({
+                'context': lambda x: retriever.get_relevant_documents(x['question']),
+                'chat_history': lambda x: x['chat_history'],
+                'question': lambda x: x['question']
+            })
+            print(f"Using inputs: {inputs}")
+
+            chain = inputs | prompt | model
+            print(f"Using chain: {chain}")
+
+            # Call the chain and stream the results into the UI
+            # response = chain.invoke({'question': question, 'chat_history': history}, config={'callbacks': [StreamHandler(response_placeholder)]})
+            response = agent.invoke(question)
+            print(f"Response: {response}")
+            print(embedding.embed_query(question))
+            content = response.content
+
+            # Write the sources used
+            relevant_documents = retriever.get_relevant_documents(question)
+            content += f"""         
 *{lang_dict['sources_used']}:*  
 """
             sources = []
@@ -394,9 +451,9 @@ if question := st.chat_input(lang_dict['assistant_question']):
                 page_content = doc.page_content
                 if source not in sources:
                     content += f"""📙 :orange[{os.path.basename(os.path.normpath(source))}]  
- """
+"""
                     sources.append(source)
-            print(f"Used sources: {sources}")
+                print(f"Used sources: {sources}")
 
         # Write the final answer without the cursor
         response_placeholder.markdown(content)
@@ -408,4 +465,4 @@ if question := st.chat_input(lang_dict['assistant_question']):
         st.session_state.messages.append(AIMessage(content=content))
 
 with st.sidebar:
-            st.caption("v11.20.01")
+    st.caption("v11.20.01")

@@ -20,7 +20,7 @@ import re
 
 load_dotenv()
 
-CUSTOMER_ID = 'f08a6894-1863-491d-8116-3945fb915597' ## Mocked for testing
+CUSTOMER_ID = 'f08a6894-1863-491d-8116-3945fb915597'  # Mocked for testing
 ASTRA_URL = f'{os.environ.get("ASTRA_API_ENDPOINT")}/api/rest/v2/keyspaces/{os.environ.get("ASTRA_KEYSPACE")}'
 astra_db = AstraDB(
     api_endpoint=os.environ.get("ASTRA_DB_VECTOR_API_ENDPOINT"),
@@ -31,6 +31,8 @@ airline_tickets_collection = AstraDBCollection(
     "airlines_tickets",  astra_db=astra_db)
 
 # For the connection with CQL Tables, we will leverage the AstraDB REST API.
+
+
 def astra_rest(table, pk, params={}, filters=[], method='GET', data={}):
     headers = {'Accept': 'application/json',
                'X-Cassandra-Token': f'{os.environ.get("ASTRA_TOKEN")}'}
@@ -113,11 +115,15 @@ def get_flight_detail(ticket_id: str) -> [str]:
     return flights['data']['document']
 
 # Auxiliary functions
+
+
 def find_tool_by_name(tools: List[Tool], tool_name: str) -> Tool:
     for tool in tools:
         if tool.name == tool_name:
             return tool
-    raise ValueError(f"Tool wtih name {tool_name} not found")
+    # raise ValueError(f"Tool wtih name {tool_name} not found")
+    return False
+
 
 def remove_json_comments(json_with_comments):
     """Sometimes, the JSON returned by the LLM contains comments, then it is needed to remove it"""
@@ -127,18 +133,22 @@ def remove_json_comments(json_with_comments):
     return json_without_comments
 
 # The Agent
+
+
 class TheFlightAssistant:
     agent = None
     tools = [get_customer_feature, get_scheduled_flights, get_flight_detail]
 
     def __init__(self, customer_id, retriever=None, memory=None):
-        retriever_tool = create_retriever_tool(
-            retriever,
-            "search_qa",
-            "Knowledge base for general questions.",
-        )
 
-        self.tools.append(retriever_tool)
+        if find_tool_by_name(self.tools, 'search_qa') == False:
+            retriever_tool = create_retriever_tool(
+                retriever,
+                "search_qa",
+                "Knowledge base for general questions.",
+            )
+
+            self.tools.append(retriever_tool)
         # https://smith.langchain.com/hub/hwchase17/react
         template = """
         Answer the following questions as best you can. You have access to the following tools:
@@ -215,4 +225,5 @@ class TheFlightAssistant:
         if isinstance(agent_step, AgentFinish):
             print(f"Finish: {agent_step.return_values}")
 
-        return agent_step.return_values['output']
+        return {'content': agent_step.return_values['output'],
+                'steps': intermediate_steps}

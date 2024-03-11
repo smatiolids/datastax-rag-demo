@@ -2,6 +2,8 @@
 streamlit
 openai
 langchain
+langchain-community
+#ragstack-ai
 tiktoken
 cassandra-driver
 cassio
