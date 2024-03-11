@@ -1,4 +1,4 @@
-## Retreival Augmented Generation (RAG) Demonstration
+## Retrieval Augmented Generation (RAG) Demonstration
 This app is intended to illustrate how you can add relevant knowledge to an otherwise basic LLM Chat.  
 
 Find a PDF with some information in it that an LLM wouldn't normally have. 

@@ -93,7 +93,6 @@ def get_scheduled_flights(customer_id: str, conditions: dict) -> [str]:
     """Returns information about scheduled flights considering conditions for arrivalAirport, departureAirport, departureDateTime. Consider Airport codes and Dates in ISO format """
     filter = {"customerId": customer_id, **conditions}
     print(f"Scheduled flights condition: {conditions}")
-
     flights = airline_tickets_collection.find(filter=filter, projection={
                                               "departureAirport": 1, "arrivalAirport": 1, "departureDateTime": 1})
     return flights['data']['documents']
@@ -110,9 +109,9 @@ class ScheduledFlightDetailInput(BaseModel):
 def get_flight_detail(ticket_id: str) -> [str]:
     """Returns information about on flight"""
     print(f"Flight detail: {ticket_id}")
-    filter = {"_id": ticket_id}
-    flights = airline_tickets_collection.find_one(filter=filter)
-    return flights['data']['document']
+    # 
+    # Define a filter and use the find_one method to get the appropriate answer 
+    return {}
 
 # Auxiliary functions
 
@@ -149,6 +148,7 @@ class TheFlightAssistant:
             )
 
             self.tools.append(retriever_tool)
+
         # https://smith.langchain.com/hub/hwchase17/react
         template = """
         Answer the following questions as best you can. You have access to the following tools:

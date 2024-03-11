@@ -130,6 +130,10 @@ def vectorize_text(uploaded_files):
                 file = [uploaded_file.read().decode()]
                 texts = text_splitter.create_documents(
                     file, [{'source': uploaded_file.name}])
+                
+                # TO-DO: Load the documents to the vector store
+                # AstraDBChatMessageHistory
+
                 vectorstore.add_documents(texts)
                 st.info(f"{len(texts)} {lang_dict['load_text']}")
 
@@ -212,10 +216,10 @@ def load_vectorstore(username):
     print(f"load_vectorstore: Astra DB ID: {ASTRA_DB_VECTOR_API_ENDPOINT[8:44]}")
     # Get the load_vectorstore store from Astra DB
     return AstraDBVectorStore(
-        embedding=embedding,
+        # Astra Vector Store connection
+        # https://python.langchain.com/docs/integrations/vectorstores/astradb#connection-parameters
         collection_name=f"vector_context_{username}",
-        token=ASTRA_DB_VECTOR_TOKEN,
-        api_endpoint=ASTRA_DB_VECTOR_API_ENDPOINT
+        ...
     )
 
 # Cache Retriever for future runs
@@ -403,7 +407,7 @@ if question := st.chat_input(lang_dict['assistant_question']):
         relevant_documents = []
         content = ''
 
-        mode = 'agent'
+        mode = 'qa'
         if mode == 'agent':
             response = agent.invoke(question)
             print(f"Response: {response}")
