@@ -2,7 +2,7 @@ from langchain.callbacks.base import BaseCallbackHandler
 from langchain.schema.runnable import RunnableMap
 from langchain.prompts import ChatPromptTemplate
 from langchain.schema import HumanMessage, AIMessage, Document
-from langchain.document_loaders import PyPDFLoader
+from langchain_community.document_loaders import PyPDFLoader
 from langchain.text_splitter import RecursiveCharacterTextSplitter
 import tempfile
 from langchain.memory import AstraDBChatMessageHistory
